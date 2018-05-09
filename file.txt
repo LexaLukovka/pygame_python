@@ -1,0 +1,175 @@
+import random
+
+import pygame
+
+pygame.init()
+
+window = pygame.display.set_mode((1366, 768))
+pygame.display.set_caption("My Game")
+
+walkRightNinja = [pygame.image.load('Ninja/Run__000.png'),
+                  pygame.image.load('Ninja/Run__001.png'),
+                  pygame.image.load('Ninja/Run__002.png'),
+                  pygame.image.load('Ninja/Run__003.png'),
+                  pygame.image.load('Ninja/Run__004.png'),
+                  pygame.image.load('Ninja/Run__005.png'),
+                  pygame.image.load('Ninja/Run__006.png'),
+                  pygame.image.load('Ninja/Run__007.png'),
+                  pygame.image.load('Ninja/Run__008.png'),
+                  pygame.image.load('Ninja/Run__009.png')]
+
+walkRightCop = [pygame.image.load('Cop/Run__000.png'),
+                pygame.image.load('Cop/Run__001.png'),
+                pygame.image.load('Cop/Run__002.png'),
+                pygame.image.load('Cop/Run__003.png'),
+                pygame.image.load('Cop/Run__004.png'),
+                pygame.image.load('Cop/Run__005.png'),
+                pygame.image.load('Cop/Run__006.png'),
+                pygame.image.load('Cop/Run__007.png'),
+                pygame.image.load('Cop/Run__008.png'),
+                pygame.image.load('Cop/Run__009.png')]
+
+playerStandCop = pygame.image.load('Cop/Idle__000.png')
+bg = pygame.image.load('Img/beaches.jpg')
+
+clock = pygame.time.Clock()
+
+
+class Pregradi():
+    def __init__(self, x, y, speed_Pregradi):
+        self.x = x
+        self.y = y
+        self.widht = 51
+        self.height = 51
+        self.speed_Pregradi = speed_Pregradi
+
+    def draw(self, window):
+        self.image = pygame.image.load('Img/crab-icon.png')
+        self.image = pygame.transform.scale(self.image, (self.widht, self.height))
+        self.rect = self.image.get_rect()
+        window.blit(self.image, (self.x, self.y))
+
+
+x_Ninja = 300
+x_Cop = 60
+y_Ninja = 600
+y_Cop = 600
+widht = 72
+height = 136
+speed_Ninja = 1
+speed_Cop = 2
+
+isJump = False
+jumpCount = 10
+
+right_Cop = False
+right_Ninja = True
+animCount_Cop = 0
+animCount_Ninjs = 0
+
+mas_pregrad = []
+count = 0
+count1 = 0
+print(mas_pregrad)
+
+# pregrada = Pregradi()
+
+
+def drawWindow():
+    global animCount_Cop, animCount_Ninjs, count
+    print(count)
+    window.blit(bg, (0, 0))
+    RndTime = random.randint(5, 10)
+    # print(RndTime)
+
+    # window.blit(pregrada.image, (pregrada.x, pregrada.y))
+    # pregrada.x -= pregrada.speed_Pregradi
+
+    if animCount_Cop + 1 >= 50:
+        animCount_Cop = 0
+
+    if right_Cop:
+        window.blit(walkRightCop[animCount_Cop // 5], (x_Cop, y_Cop))
+        animCount_Cop += 1
+    else:
+        window.blit(playerStandCop, (x_Cop, y_Cop))
+
+    if right_Ninja:
+        window.blit(walkRightNinja[animCount_Ninjs // 5], (x_Ninja, y_Ninja))
+        animCount_Ninjs += 1
+
+    for mas in mas_pregrad:
+        mas.draw(window)
+
+    pygame.display.update()
+
+
+run = True
+while run:
+    clock.tick(50)
+    count += 1
+
+    # print(x_Cop // 5, pregrada.x // 5, count, count1)
+
+    for mas in mas_pregrad:
+        if mas.x < 1366 and mas.x > 0:
+            mas.x += mas.speed_Pregradi
+        else:
+            mas_pregrad.pop(mas_pregrad.index(mas))
+
+    # if count == 20:
+
+
+    x_Ninja += speed_Ninja
+    animCount_Ninjs += 1
+    if animCount_Ninjs + 1 >= 50:
+        animCount_Ninjs = 0
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_SPACE]:
+        mas_pregrad.append(Pregradi(1366, 680, 4))
+
+    if keys[pygame.K_LEFT] and x_Cop > 5:
+        x_Cop -= speed_Cop
+    elif keys[pygame.K_RIGHT] and x_Cop < 1366 - widht - 5:
+        x_Cop += speed_Cop
+        right_Cop = True
+    else:
+        right_Cop = False
+        animCount_Cop = 0
+
+    if not (isJump):
+        if keys[pygame.K_UP]:
+            isJump = True
+    else:
+        if jumpCount >= -10:
+            if jumpCount < 0:
+                x_Cop += speed_Cop * 3
+                y_Cop += (jumpCount ** 2) / 2
+            else:
+                y_Cop -= (jumpCount ** 2) / 2
+            jumpCount -= 1
+        else:
+            isJump = False
+            jumpCount = 10
+
+    # if x_Cop // 5 == pregrada.x // 5:
+    #     count1 = 50
+    #     speed_Cop = 0
+    #     window.blit(playerStandCop, (x_Cop, y_Cop))
+
+    # if count1 <= 50:
+    #     count1 -= 1
+
+    # if count1 == 0:
+    #     speed_Cop = 1.5
+    #     print(22222222222222222222222222222222222)
+
+    drawWindow()
+
+pygame.quit()
