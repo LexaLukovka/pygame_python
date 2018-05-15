@@ -7,6 +7,8 @@ pygame.init()
 window = pygame.display.set_mode((1366, 768))
 pygame.display.set_caption("My Game")
 
+font = pygame.font.SysFont('Arial', 18, bold=True)
+
 walkRightNinja = [pygame.image.load('Ninja/Run__000.png'),
                   pygame.image.load('Ninja/Run__001.png'),
                   pygame.image.load('Ninja/Run__002.png'),
@@ -36,7 +38,12 @@ Cop_Dead = pygame.image.load('Cop/Dead__000.png')
 bg = pygame.image.load('Img/beaches.jpg')
 win = pygame.image.load('Img/win5.png')
 lose = pygame.image.load('Img/lose.png')
-
+slow = pygame.image.load('Img/Slow.png')
+slow = pygame.transform.scale(slow, (85, 45))
+pinguin = pygame.image.load('Img/pingvin.png')
+pinguin = pygame.transform.scale(pinguin, (30, 50))
+crabs = pygame.image.load('Img/crab-icon.png')
+crabs = pygame.transform.scale(crabs, (40, 40))
 clock = pygame.time.Clock()
 
 
@@ -47,7 +54,7 @@ class Pregradi_Crab(pygame.sprite.Sprite):
         self.y = 600
         self.widht = 51
         self.height = 51
-        self.speed_Pregradi = 5
+        self.speed_Pregradi = 5.0
 
         self.image = pygame.image.load('Img/crab-icon.png')
         self.image = pygame.transform.scale(self.image, (self.widht, self.height))
@@ -61,7 +68,7 @@ class Pregradi_Pingvin(pygame.sprite.Sprite):
         self.y = 600
         self.widht = 50
         self.height = 70
-        self.speed_Pregradi = 5
+        self.speed_Pregradi = 5.0
 
         self.image = pygame.image.load('Img/pingvin.png')
         self.image = pygame.transform.scale(self.image, (self.widht, self.height))
@@ -127,7 +134,7 @@ def drawWindow():
         if pregrada_crab.x < 10 or pregrada_crab.x > 1366:
             mas_pregrad_crab.pop(mas_pregrad_crab.index(pregrada_crab))
 
-        if x_Cop // 10 == pregrada_crab.x // 10 and y_Cop == pregrada_crab.y:
+        if (x_Cop + 15) // 10 == pregrada_crab.x // 10 and y_Cop // 10 == pregrada_crab.y // 10:
             counter_for_Cop = 100
             speed_Cop = 0
             window.blit(playerStandCop, (x_Cop, y_Cop))
@@ -138,23 +145,40 @@ def drawWindow():
         if counter_for_Cop == 0:
             speed_Cop = 1.5
 
+        if counter_for_Cop >= 0 and counter_for_Cop <= 100:
+            window.blit(slow, (x_Cop, y_Cop - 50))
+
+    # print(x_Cop, x_Cop // 2)
     for pregrada_pingvin in mas_pregrad_pingvin:
         window.blit(pregrada_pingvin.image, (pregrada_pingvin.x, pregrada_pingvin.y + 60))
 
         if pregrada_pingvin.x < 10 or pregrada_pingvin.x > 1366:
             mas_pregrad_pingvin.pop(mas_pregrad_pingvin.index(pregrada_pingvin))
 
-        if x_Cop // 10 == pregrada_pingvin.x // 10 and y_Cop == pregrada_pingvin.y:
+        if x_Cop // 10 == pregrada_pingvin.x // 10 and y_Cop // 10 == pregrada_pingvin.y // 10:
             pregrada_pingvin.run_away = True
 
         if not pregrada_pingvin.run_away:
             pregrada_pingvin.x -= pregrada_pingvin.speed_Pregradi
+            if pregrada_pingvin.x // 10 == (x_Ninja) // 10:
+                if pregrada_pingvin.y // 10 == y_Ninja // 10:
+                    speed_Ninja = 0.5
+                    counter_for_Ninja = 100
+
         else:
             pregrada_pingvin.x += pregrada_pingvin.speed_Pregradi
+            # if pregrada_pingvin.x // 10 == (x_Ninja - 102) // 10:
+            #     if pregrada_pingvin.y // 10 == y_Ninja // 10:
+            #         speed_Ninja = 0.5
+            #         counter_for_Ninja = 100
 
-        if x_Ninja // 10 == pregrada_pingvin.x // 10:
-            speed_Ninja = 0.5
-            counter_for_Ninja = 100
+        # if ((x_Ninja)//2  == (pregrada_pingvin.x )//2) and (y_Ninja//2  == pregrada_pingvin.y//2 ):
+        #     if pregrada_pingvin.x > x_Ninja and pregrada_pingvin.x < x_Ninja + 10:
+
+        # if (pregrada_pingvin.x + 10) // 10 == x_Ninja // 10:
+        #     if pregrada_pingvin.y == y_Ninja:
+        #         speed_Ninja = 0.5
+        #         counter_for_Ninja = 100
 
         if counter_for_Ninja <= 100:
             counter_for_Ninja -= 1
@@ -162,13 +186,51 @@ def drawWindow():
         if counter_for_Ninja == 0:
             speed_Ninja = 1
 
+        if 0 <= counter_for_Ninja <= 100:
+            window.blit(slow, (x_Ninja, y_Ninja - 50))
+
+        # def rand():
         x = random.randint(0, 100)
         if not isJump_Ninja:
-            if (x_Ninja + 15) // 10 == pregrada_pingvin.x // 10:
-                if x >= 0 and x <= 90:
-                    isJump_Ninja = True
-                else:
-                    isJump_Ninja = False
+            if not pregrada_pingvin.run_away:
+                if pregrada_pingvin.x // 10 == (x_Ninja + 15) // 10:
+                    if pregrada_pingvin.y // 10 == y_Ninja // 10:
+                        x = random.randint(0, 100)
+                        if x >= 0 and x <= 75:
+                            isJump_Ninja = True
+                        else:
+                            isJump_Ninja = False
+            else:
+                if pregrada_pingvin.x // 10 == (x_Ninja - 5) // 10:
+                    if pregrada_pingvin.y // 10 == y_Ninja // 10:
+                        x = random.randint(0, 100)
+                        if x >= 0 and x <= 75:
+                            isJump_Ninja = True
+                        else:
+                            isJump_Ninja = False
+            # if (x_Ninja) // 10 == pregrada_pingvin.x // 10:
+            # if pregrada_pingvin.x > x_Ninja and pregrada_pingvin.x < x_Ninja + 10:
+            #     if pregrada_pingvin.y == y_Ninja:
+
+            # if pregrada_pingvin.x > x_Ninja:
+            # if 0 <= (pregrada_pingvin.x - x_Ninja + 36) < 10:
+
+            # if (pregrada_pingvin.x) // 10 == (x_Ninja + 15) // 10:
+            #     if pregrada_pingvin.y //10 == y_Ninja//10:
+            #         if x >= 0 and x <= 75:
+            #             isJump_Ninja = True
+            #         else:
+            #             isJump_Ninja = False
+
+            # elif pregrada_pingvin.x < x_Ninja:
+            #     if (pregrada_pingvin.x) // 10 == (x_Ninja-36) // 10:
+            #         print(4)
+            #         if pregrada_pingvin.y == y_Ninja:
+            #             print(5)
+            #             if x >= 0 and x <= 50:
+            #                 isJump_Ninja = True
+            #             else:
+            #                 isJump_Ninja = False
         else:
             if jumpCount_Ninja >= -10:
                 if jumpCount_Ninja < 0:
@@ -217,6 +279,15 @@ def drawWindow():
         window.blit(lose, ((1366 / 2 - 250), (768 / 2 - 200)))
         pregrada_crab.speed_Pregradi = 0
         pregrada_pingvin.speed_Pregradi = 0
+
+    tip1 = font.render('Penguin slows down the Ninja', 1, (255, 255, 255))
+    window.blit(pinguin, (1050, 10))
+    window.blit(tip1, (1100, 10))
+    tip2 = font.render('Crab slows down the Cowboy', 1, (255, 255, 255))
+    window.blit(crabs, (1050, 55))
+    window.blit(tip2, (1100, 65))
+    tip3 = font.render('You can throw a penguin', 1, (255, 255, 255))
+    window.blit(tip3, (1100, 35))
 
     pygame.display.update()
 
